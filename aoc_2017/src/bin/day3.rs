@@ -6,33 +6,63 @@ fn main() {
     println!("part 2: {}", spiral_memory_stored_value(input, false));
 }
 
+//LEFT UP RIGHT DOWN
+const DIRECTIONS: [(i32, i32); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];  
+const NEIGHBORS:  [(i32, i32); 8] = [(-1, 1),  (0, 1),  (1, 1), 
+                                     (-1, 0),           (1, 0),
+                                     (-1, -1), (0, -1), (1, -1)];
+
+#[derive(Debug)]
+struct SpiralMemory {
+    prev_number: i32,
+    direction_index: usize,
+    side: usize,
+    side_index: usize,
+    position: (i32, i32)
+}
+
+//Poor man's yield
+impl Iterator for SpiralMemory {
+    type Item = (i32, i32, i32);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let (dx, dy) = DIRECTIONS[self.direction_index];
+
+        self.prev_number += 1;
+        self.position.0 += dx;
+        self.position.1 += dy;
+
+        self.side_index += 1;
+        if self.side_index == self.side {
+            self.direction_index = (self.direction_index + 1) % DIRECTIONS.len();
+            if self.direction_index % 2 == 0 {
+                self.side += 1;
+            }
+
+            self.side_index = 0;
+        }
+
+        //println!("{:?}", self);
+        Some((self.prev_number, self.position.0, self.position.1))
+    }
+}
+
+
 fn spiral_memory_manhattan_distance(number: i32) -> i32 {
     if number == 1 {
         return 0;
     }
 
-    //LEFT UP RIGHT DOWN
-    let directions = [(1, 0), (0, 1), (-1, 0), (0, -1)];  
+    let spiral_memory = SpiralMemory {
+        prev_number: 1,
+        direction_index: 0,
+        side: 1,
+        side_index: 0,
+        position: (0, 0),
+    };
 
-    let mut i = 1;
-    let (mut x, mut y, mut side) = (0i32, 0i32, 0u32);
-    loop {
-        for (n, (dx, dy)) in directions.iter().enumerate() {
-            if n % 2 == 0 { //left and right
-                side += 1;
-            }
-
-            for _ in 0..side {
-                i += 1;
-                x += dx;
-                y += dy;
-
-                if i == number {
-                    return x.abs() + y.abs();
-                }
-            }    
-        }
-    }
+   let (_, x, y) = spiral_memory.into_iter().filter(|(i, _, _)| *i == number).next().unwrap();
+   x.abs() + y.abs()
 }
 
 fn spiral_memory_stored_value(number: i32, sequence: bool) -> i32 {
@@ -43,42 +73,23 @@ fn spiral_memory_stored_value(number: i32, sequence: bool) -> i32 {
     let mut values = HashMap::new();
     values.insert((0, 0), 1);
 
-    //LEFT UP RIGHT DOWN
-    let directions = [(1, 0), (0, 1), (-1, 0), (0, -1)];  
-    let neighbors = [(-1, 1),  (0, 1),  (1, 1), 
-                                   (-1, 0),           (1, 0),
-                                   (-1, -1), (0, -1), (1, -1)];
-    
-    let mut i = 1;
-    let (mut x, mut y, mut side) = (0i32, 0i32, 0u32);
-    loop {
-        for (n, (dx, dy)) in directions.iter().enumerate() {
-            if n % 2 == 0 { //left and right
-                side += 1;
-            }
+    let spiral_memory = SpiralMemory {
+        prev_number: 1,
+        direction_index: 0,
+        side: 1,
+        side_index: 0,
+        position: (0, 0),
+    };
 
-            for _ in 0..side {
-                i += 1;
-                x += dx;
-                y += dy;
+    spiral_memory.into_iter().map(|(i, x, y)| {
+        let value = NEIGHBORS.iter()
+                            .map(|(dx, dy)|
+                                values.get(&(x + dx, y + dy)).unwrap_or(&0)
+                            ).sum();
+        values.insert((x, y), value);
 
-                let value = neighbors.iter()
-                    .map(|(dx, dy)|
-                        values.get(&((x + dx, y + dy))).unwrap_or(&0)
-                    ).sum();
-
-                if sequence {
-                    if i == number {
-                        return value; //for part2 tests
-                    }
-                } else if value > number {
-                    return value; //for part2
-                }
-
-                values.insert((x, y), value);
-            }    
-        }
-    }
+        (i, value)
+    }).filter(|(i, value)| if sequence { *i == number } else { *value > number}).next().unwrap().1
 }
 
 #[cfg(test)]
