@@ -1,1 +1,1 @@
-# AdventOfCode In Rust
+# Advent Of Code In Rust
