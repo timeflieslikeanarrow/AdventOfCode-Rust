@@ -1,10 +1,10 @@
 use std::fs;
-use std::iter::FromIterator;
 
 fn main() {
     let input = fs::read_to_string("day9.input").unwrap();
     let (_, scores) = count_and_score_groups(&input);
     println!("part 1: {}", scores);
+    println!("part 2 {}", count_garbage_chars(&input));
 }
 
 fn to_chars(input: &str) -> Vec<char> {
@@ -18,11 +18,12 @@ fn remove_bang(input: Vec<char>) -> Vec<char> {
     let mut i = 0;
     while i < n {
         if input[i] == '!' {
-            i += 2
+            i += 1; //ignore the next char
         } else {
             result.push(input[i]);
-            i += 1;
         }
+
+        i += 1
     }
 
     result
@@ -72,6 +73,33 @@ fn count_and_score_groups(input: &str) -> (usize, usize) {
     (groups, total_scores)
 }
 
+fn count_garbage_chars(input: &str) -> usize {
+    let input = remove_bang(to_chars(input));
+
+    let n = input.len();
+    let mut result = 0;
+    let mut i = 0;
+    while i < n {
+        if input[i] == '<' {
+            let mut j = i + 1;
+            while j < n && input[j] != '>' {
+                j += 1;
+            }
+
+            if j < n {
+                result += j - i - 1;
+            }
+
+            i = j;
+        } 
+
+        i += 1;
+    }
+
+    result
+}
+
+
 #[cfg(test)]
 mod day9_tests {
     use super::*;
@@ -109,6 +137,17 @@ mod day9_tests {
         assert_eq!(count_and_score_groups("{{<ab>},{<ab>},{<ab>},{<ab>}}").1, 9);
         assert_eq!(count_and_score_groups("{{<!!>},{<!!>},{<!!>},{<!!>}}").1, 9);
         assert_eq!(count_and_score_groups("{{<a!>},{<a!>},{<a!>},{<ab>}}").1, 3);
+    }
+
+    #[test]
+    fn count_garbage_chars_tests() {
+        assert_eq!(count_garbage_chars("<>"), 0);
+        assert_eq!(count_garbage_chars("<random characters>"), 17);
+        assert_eq!(count_garbage_chars("<<<<>"), 3);
+        assert_eq!(count_garbage_chars("<{!>}>"), 2);
+        assert_eq!(count_garbage_chars("<!!>"), 0);
+        assert_eq!(count_garbage_chars("<!!!>>"), 0);
+        assert_eq!(count_garbage_chars("<{o\"i!a,<{i<a>"), 10);
     }
 }
 
