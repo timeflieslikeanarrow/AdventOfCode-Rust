@@ -42,7 +42,7 @@ mod day11_tests {
     use super::*;
 
     #[test]
-    fn example() {
+    fn examples() {
         assert_eq!(steps("ne,ne,ne").0, 3);
         assert_eq!(steps("ne,ne,sw,sw").0, 0);
         assert_eq!(steps("ne,ne,s,s").0, 2);
