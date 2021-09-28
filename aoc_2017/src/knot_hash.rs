@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 pub fn knot_hash(seed:&str) -> String {
     let result = knot_hash_u8(seed);
     let result: Vec<_> = result.into_iter().map(|b| format!("{:02x}", b)).collect();
