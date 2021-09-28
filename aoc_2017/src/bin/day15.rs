@@ -66,7 +66,7 @@ mod day15_tests {
     use super::*;
 
     #[test]
-    fn part1_examples() {
+    fn examples() {
         assert_eq!(count_matches(65, 1, 8921, 1, 40_000_000), 588);
         assert_eq!(count_matches(65, 4, 8921, 8, 5_000_000), 309);
     }
