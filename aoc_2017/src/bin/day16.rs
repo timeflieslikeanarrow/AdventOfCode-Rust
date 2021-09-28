@@ -7,6 +7,7 @@ fn main() {
     println!("part 2: {}", run(&input, 1_000_000_000));
 }
 
+#[derive(Clone)]
 enum Moves {
     Spin(usize),
     Exchange(usize, usize),
@@ -15,10 +16,27 @@ enum Moves {
 
 use self::Moves::*;
 
-fn run(input: &str, times: usize) -> String {
+fn run(input: &str, mut times: usize) -> String {
     let moves: Vec<_> = input.trim().split(",").map(|m| parse_move(m)).collect();
-    let programs = (b'a' ..= b'p').collect();
-    let result = permute(programs, moves, times);
+    let original_programs: Vec<_> = (b'a' ..= b'p').collect();
+
+    if times > 1 {
+        let mut programs = original_programs.clone();
+        let mut count_to_repeat = 0;
+
+        loop {
+            count_to_repeat += 1;
+            programs = permute(programs, &moves, 1);
+            if &programs == &original_programs {
+                println!("times to repeat: {}", count_to_repeat);
+                break;
+            }
+        }
+
+        times = times % count_to_repeat;
+    }
+
+    let result = permute(original_programs, &moves, times);
     String::from_utf8(result).unwrap()
 }
 
@@ -36,10 +54,10 @@ fn parse_move(input: &str) -> Moves {
     }
 }
 
-fn permute(mut programs: Vec<u8>, moves: Vec<Moves>, times: usize) -> Vec<u8> {
+fn permute(mut programs: Vec<u8>, moves: &Vec<Moves>, times: usize) -> Vec<u8> {
     let n = programs.len();
 
-    for t in 0..times {
+    for _ in 0..times {
         for m in moves.iter() {
             match m {
                 Spin(last_n) => {
@@ -54,10 +72,6 @@ fn permute(mut programs: Vec<u8>, moves: Vec<Moves>, times: usize) -> Vec<u8> {
                 }
             }
         }
-
-        if t % 1_000_000 == 0 {
-            println!("{}", t);
-        }
     }
 
     programs
@@ -69,7 +83,7 @@ mod day16_tests {
 
     #[test]
     fn examples() {
-        assert_eq!(permute(vec![b'a',b'b',b'c', b'd', b'e'], vec![Spin(1), Exchange(3,4), Partner(b'e', b'b')], 1), vec![b'b',b'a', b'e', b'd', b'c']);
-        assert_eq!(permute(vec![b'a',b'b',b'c', b'd', b'e'], vec![Spin(1), Exchange(3,4), Partner(b'e', b'b')], 2), vec![b'c',b'e', b'a', b'd', b'b']);
+        assert_eq!(permute(vec![b'a',b'b',b'c', b'd', b'e'], &vec![Spin(1), Exchange(3,4), Partner(b'e', b'b')], 1), vec![b'b',b'a', b'e', b'd', b'c']);
+        assert_eq!(permute(vec![b'a',b'b',b'c', b'd', b'e'], &vec![Spin(1), Exchange(3,4), Partner(b'e', b'b')], 2), vec![b'c',b'e', b'a', b'd', b'b']);
     }
 }
