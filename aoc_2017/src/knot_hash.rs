@@ -1,4 +1,12 @@
+use std::fmt::format;
+
 pub fn knot_hash(seed:&str) -> String {
+    let result = knot_hash_u8(seed);
+    let result: Vec<_> = result.into_iter().map(|b| format!("{:02x}", b)).collect();
+    result.join("")
+}
+
+pub fn knot_hash_u8(seed:&str) -> Vec<u8> {
     let mut lengths = numbers_to_ascii(seed);
     lengths.extend_from_slice(&[17,31,73,47,23]);
 
@@ -6,11 +14,9 @@ pub fn knot_hash(seed:&str) -> String {
 
     reverse_and_skip(&mut numbers, &lengths, 64);
 
-    let result: Vec<_> = (0..=255).step_by(16)
-            .map(|start| format!("{:02x}", compute_hash(&numbers, start, 16)))
-            .collect();
-
-    result.join("")
+    (0..=255).step_by(16)
+            .map(|start| compute_hash(&numbers, start, 16))
+            .collect()
 }
 
 fn numbers_to_ascii(input: &str) -> Vec<u8> {
