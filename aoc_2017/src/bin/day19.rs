@@ -26,12 +26,7 @@ fn route(input: &str) -> (String, usize) {
     let mut dx: i32 = 0;
     loop {
         steps += 1;
-
-        // if steps % 10_000 == 0 {
-        //     println!("steps so far: {} ({}, {}) **{}**", steps, x, y, map[y as usize][x as usize]);
-        //     println!("signs: {:?}",signs);
-        // }
-
+        
         x += dx;
         y += dy;
 
@@ -39,38 +34,21 @@ fn route(input: &str) -> (String, usize) {
             break;
         }
 
-        let x = x as usize;
-        let y = y as usize;
-
-        let current = map[y][x];
+        let current = map[y as usize][x as usize];
         match current {
+            ' ' => break, //the end
+            c if c.is_alphabetic() => signs.push(c),
             '+' => {    
-                if dx == 0 { //vertical
-                    if x > 0 && map[y][x - 1] != ' ' {
-                        dx = -1;
-                    } else if x + 1 < map[y].len() && map[y][x + 1] != ' ' {
-                        dx = 1;
-                    } else {
-                        panic!("don't know where to go: ({}, {})", x, y);
+                let neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+                for (dx2, dy2) in neighbors {
+                    if dx2 != dx && dy2 != dy && dx2 != -dx && dy2 != -dy && map[(y + dy2) as usize][(x + dx2) as usize] != ' ' {
+                        dx = dx2;
+                        dy = dy2;
+                        break;
                     }
-
-                    dy = 0;
-                } else {  //dy == 0 horizontal
-                    if y > 0 && map[y - 1][x] != ' ' {
-                        dy = -1;
-                    } else if y + 1 < max_y && map[y + 1][x] != ' ' {
-                        dy = 1;
-                    } else {
-                        panic!("don't know where to go: ({}, {})", x, y);
-                    }
-
-                    dx = 0;
                 }
             }
-            '-' => {}
-            '|' => {}
-            ' ' => break, //the end
-            _ => { signs.push(current) }
+            _ => ()
         }
     }
 
