@@ -6,7 +6,7 @@ use aoc_2017::processor::{parse_input};
 
 fn main() {
     let input = fs::read_to_string("day23.input").unwrap();
-    let program = Program::new(&input, 0);
+    let program = Program::new(&input);
     println!("instructions count: {}", program.instructions.len());
     println!("part 1: {}", program.run(0));
 
@@ -16,14 +16,12 @@ fn main() {
 
 struct Program<'a> {
     instructions: Vec<(&'a str, Value, Value)>,
-    id: i64
 }
 
 impl<'a> Program<'a> {
-    pub fn new(input: &'a str, id: i64) -> Self {
+    pub fn new(input: &'a str) -> Self {
         Program { 
             instructions: parse_input(input),
-            id,
          }
     }
 
@@ -112,7 +110,13 @@ impl<'a> Program<'a> {
 
 
 fn simulate(a: i64) -> i64 {
-    let (mut b, mut c, mut d, mut e, mut f, mut g,mut h) = (0i64, 0i64, 0i64, 0i64, 0i64, 0i64, 0i64);
+    let mut b: i64;
+    let mut c: i64;
+    let mut d: i64;
+    //let mut e: i64;
+    let mut f: i64;
+    let mut g: i64;
+    let mut h: i64 = 0; 
 
     b = 79;
     c = b;
@@ -132,7 +136,7 @@ fn simulate(a: i64) -> i64 {
 
         loop
         {
-            e = 2;
+            //e = 2;
             
             if b % d == 0 {
                 f = 0;
