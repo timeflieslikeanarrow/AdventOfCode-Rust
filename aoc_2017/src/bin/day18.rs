@@ -2,6 +2,10 @@ use std::{fs, thread};
 use std::time::Duration;
 use std::collections::HashMap;
 use std::sync::mpsc::{Receiver, Sender, channel};
+
+use aoc_2017::processor::Value::{self, *};
+use aoc_2017::processor::{parse_input};
+
 fn main() {
     let input = fs::read_to_string("day18.input").unwrap();
     let mut program = Program::new(&input, 0);
@@ -28,44 +32,15 @@ fn main() {
     println!("part 2: {}", result);
 }
 
-#[derive(Debug)]
-enum Value {
-    Register(char),
-    Number(i64),
-}
-
-use self::Value::*;
-
-fn parse_value(input: &str) -> Value {
-    match input.parse() {
-        Err(_) => Register(input.chars().next().unwrap()),
-        Ok(n) => Number(n),
-    }
-}
-
-fn parse(input: &str) -> Vec<(&str, Value, Value)> {
-    input.trim().lines().map(|line| {
-        let parts: Vec<_> = line.split(" ").collect();
-        let value1 = parse_value(parts[1]);
-        let value2 = if parts.len() > 2 {
-            parse_value(parts[2])
-        } else {
-            Number(i64::MIN)
-        };
-
-        (parts[0], value1, value2)
-    }).collect()
-}
-
 struct Program<'a> {
     instructions: Vec<(&'a str, Value, Value)>,
     id: i64
 }
 
 impl<'a> Program<'a> {
-    fn new(input: &'a str, id: i64) -> Self {
+    pub fn new(input: &'a str, id: i64) -> Self {
         Program { 
-            instructions: parse(input),
+            instructions: parse_input(input),
             id,
          }
     }
