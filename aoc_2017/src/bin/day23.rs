@@ -133,22 +133,11 @@ fn simulate(a: i64) -> i64 {
         loop
         {
             e = 2;
-            loop {
-                g = d;
-                g *= e;
-                g -= b;
-                if g == 0 {
-                    f = 0;
-                }
-                e -= -1;
-                g = e;
-                g -= b;
-
-                if g == 0 {
-                    break;
-                }
+            
+            if b % d == 0 {
+                f = 0;
             }
-        
+
             d -= -1;
             g = d;
             g -= b;
@@ -170,7 +159,7 @@ fn simulate(a: i64) -> i64 {
 
         b -= -17;
     
-        println!("a={} b={} c={} d={} e={} f={} g={} h={}", a, b, c, d, e, f, g, h);
+        //println!("a={} b={} c={} d={} e={} f={} g={} h={}", a, b, c, d, e, f, g, h);
     } 
 
     h
