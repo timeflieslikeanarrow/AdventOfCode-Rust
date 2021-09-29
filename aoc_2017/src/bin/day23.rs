@@ -74,13 +74,13 @@ impl<'a> Program<'a> {
                         println!("{:?}", registers);
                     }
                 }
-                "mod" => {
-                    let register = Program::get_register(value1);
-                    let value =  Program::get_value(value2, &registers);
+                // "mod" => {
+                //     let register = Program::get_register(value1);
+                //     let value =  Program::get_value(value2, &registers);
 
-                    let entry= registers.entry(register).or_insert(0);
-                    *entry %= value;
-                }
+                //     let entry= registers.entry(register).or_insert(0);
+                //     *entry %= value;
+                // }
                 "mul" => {
                     let register = Program::get_register(value1);
                     let value =  Program::get_value(value2, &registers);
@@ -112,7 +112,7 @@ impl<'a> Program<'a> {
 
 
 fn simulate(a: i64) -> i64 {
-    let (mut b, mut c, mut d, mut e, mut f, mut g,mut h) = (0, 0, 0, 0, 0, 0, 0);
+    let (mut b, mut c, mut d, mut e, mut f, mut g,mut h) = (0i64, 0i64, 0i64, 0i64, 0i64, 0i64, 0i64);
 
     b = 79;
     c = b;
@@ -132,8 +132,8 @@ fn simulate(a: i64) -> i64 {
 
         loop
         {
+            e = 2;
             loop {
-                e = 2;
                 g = d;
                 g *= e;
                 g -= b;
